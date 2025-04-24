@@ -4,8 +4,6 @@ namespace DriverAcelerator {
     // GLOBAL VARIABLES
     float finalLeft = 0;
     float finalRight = 0;
-    float startLeft = 0;
-    float startRight = 0;
     float lastLeft = 0;
     float lastRight = 0;
 
@@ -15,21 +13,27 @@ namespace DriverAcelerator {
         lastRight = lastRight_;
     }
 
-    void registerStart()
-    {
-        startLeft = lastLeft;
-        startRight = lastRight;
-    }
-
     void registerFinal(float finalLeft_, float finalRight_)
     {
         finalLeft = finalLeft_;
         finalRight = finalRight_;
     }
 
-    void acelerate(float *newLeft, float *newRight)
+    void acelerate(float *newLeft, float *newRight, int steps)
     {
-        *newLeft = finalLeft;
-        *newRight = finalRight;
+        // Puede que ciertos movimientos requieran una aceleracion mas lenta
+        // Cuando se haya completado el tiempo de aceleracion, recibiremos una bandera de steps 0
+        if(steps > 0) {
+            // Graduamos la nueva velocidad para que acelere en los steps provistos
+            float difLeft = finalLeft - lastLeft;
+            float difRight = finalRight - lastRight;
+            *newLeft = lastLeft + difLeft / steps;
+            *newRight = lastRight + difRight / steps;
+        }
+        else {
+            // Ante la bandera de 0, debemos asegurarnos de tener la velocidad correcta
+            *newLeft = finalLeft;
+            *newRight = finalRight;
+        }
     }
 }
